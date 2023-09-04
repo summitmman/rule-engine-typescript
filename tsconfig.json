@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "types": ["lodash"],
+    "typeRoots": ["node_modules/@types"]
+  }
+}

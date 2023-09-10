@@ -37,10 +37,10 @@ const rules: Array<Rule<Config>> = [
         type: ConditionType.Condition,
         key: 'geolocation',
         condition: isEqual('Bangalore'),
-        result: () => ({
+        result: {
           amount: 0.034,
           emi: 8.077,
-        }),
+        },
       },
     ],
   },

@@ -5,10 +5,11 @@ import {
   IConditionGroup,
   INot,
   IDefault,
+  ResultFunction,
 } from './interfaces';
 import { ConditionType } from './enums';
 
-export const runCondition = <T>(
+const runCondition = <T>(
   dataSource: any,
   rule: Rule<T> | ICondition | IConditionGroup | INot
 ): boolean | null => {
@@ -52,6 +53,17 @@ export const runCondition = <T>(
   return final;
 };
 
+const runResult = <T>(
+  result: ResultFunction<T> | T,
+  dataSource: any,
+  id?: string
+): T => {
+  if (typeof result === 'function') {
+    return (result as ResultFunction<T>)(dataSource, id);
+  }
+  return result;
+};
+
 export const runRules = <T>(
   dataSource: any,
   rules: Array<Rule<T>>
@@ -81,7 +93,7 @@ export const runRules = <T>(
           return runRules(dataSource, rule.next);
         }
         // else we have found matching rule and can return the result
-        return rule.result(dataSource, rule.id);
+        return runResult(rule.result, dataSource, rule.id);
       }
     }
   }
@@ -90,7 +102,7 @@ export const runRules = <T>(
   // check if there was a default type rule
   // if so return the default result
   if (defaultRule) {
-    return defaultRule.result(dataSource, ConditionType.Default);
+    return runResult(defaultRule.result, dataSource, ConditionType.Default);
   }
 
   return null;

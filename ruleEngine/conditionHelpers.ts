@@ -18,3 +18,13 @@ export const isEqual: ConditionFunctionGenerator = (
     return value === target;
   };
 };
+
+export type conditionMap = {
+  'isBetween': {
+    start: any;
+    end: any;
+  },
+  'isEqual': {
+    target: any
+  }
+};

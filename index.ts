@@ -1,8 +1,8 @@
 // Import stylesheets
 import './style.css';
 // Import modules
-import { Rule } from './ruleEngine/interfaces';
-import { ConditionType } from './ruleEngine/enums';
+import { Rule, RuleJSON } from './ruleEngine/interfaces';
+import { ConditionName, ConditionType } from './ruleEngine/enums';
 import { runRules } from './ruleEngine/utils';
 import { isBetween, isEqual } from './ruleEngine/conditionHelpers';
 
@@ -79,3 +79,54 @@ const testData = {
 
 let output: Config = runRules<Config>(testData, rules);
 console.log(output);
+
+
+const newRules: Array<RuleJSON<Config>> = [
+  {
+    type: ConditionType.And,
+    conditions: [
+      {
+        type: ConditionType.Condition,
+        key: 'tenure',
+        condition: {
+          name: ConditionName.isBetween,
+          start:20,
+          end: 30
+        }
+      },
+      {
+        type: ConditionType.Condition,
+        key: 'city',
+        condition: {
+          name: 'isEqual',
+          values: ['Delhi']
+        }
+      }
+    ],
+    result: {
+      amount: 10,
+      emi: 5
+    }
+  },
+  {
+    type: ConditionType.And,
+    conditions: [
+      {
+        type: ConditionType.Condition,
+        key: 'tenure',
+        condition: isBetween(50, 100)
+      },
+      {
+        type: ConditionType.Condition,
+        key: 'city',
+        condition: isEqual('Delhi')
+      }
+    ],
+    result: {
+      amount: 20,
+      emi: 8
+    }
+  }
+];
+
+console.log(JSON.stringify(newRules));

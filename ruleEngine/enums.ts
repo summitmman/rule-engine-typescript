@@ -5,3 +5,8 @@ export enum ConditionType {
   Not = 'not',
   Default = 'default'
 }
+
+export enum ConditionName {
+  isBetween = 'isBetween',
+  isEqual = 'isEqual'
+}

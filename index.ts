@@ -62,6 +62,13 @@ const rules: Array<Rule<Config>> = [
       emi: 21.963,
     }),
   },
+  {
+    type: ConditionType.Default,
+    result: () => ({
+      amount: 1.1,
+      emi: 1.1,
+    }),
+  },
 ];
 
 const testData = {
@@ -71,10 +78,4 @@ const testData = {
 };
 
 let output: Config = runRules<Config>(testData, rules);
-if (output === null) {
-  output = {
-    amount: 10,
-    emi: 10,
-  };
-}
 console.log(output);

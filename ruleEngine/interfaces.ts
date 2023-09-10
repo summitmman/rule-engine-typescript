@@ -33,4 +33,9 @@ type Not<T> = INot & Either<IResult<T>, INext<T>>;
 interface IRule {
   id?: string;
 }
-export type Rule<T> = IRule & (Condition<T> | ConditionGroup<T> | Not<T>);
+export interface IDefault<T> extends IResult<T> {
+  type: ConditionType.Default;
+}
+export type Rule<T> =
+  | (IRule & (Condition<T> | ConditionGroup<T> | Not<T>))
+  | IDefault<T>;

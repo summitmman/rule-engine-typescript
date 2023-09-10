@@ -3,4 +3,5 @@ export enum ConditionType {
   And = 'and',
   Or = 'or',
   Not = 'not',
+  Default = 'default'
 }

@@ -4,7 +4,7 @@ import './style.css';
 import { Rule, RuleJSON } from './ruleEngine/interfaces';
 import { ConditionName, ConditionType } from './ruleEngine/enums';
 import { runRules } from './ruleEngine/utils';
-import { isBetween, isEqual } from './ruleEngine/conditionHelpers';
+import * as conditionHelper from './ruleEngine/conditionHelpers';
 
 // Write TypeScript code!
 const appDiv: HTMLElement = document.getElementById('app');
@@ -15,6 +15,8 @@ interface Config {
   emi: number;
 }
 
+const { isBetween, isEqual } = conditionHelper;
+
 // TODO:
 // 1. add else support
 // 2. figure better way to nest conditions
@@ -22,12 +24,12 @@ const rules: Array<Rule<Config>> = [
   {
     type: ConditionType.Condition,
     key: 'tenure',
-    condition: isBetween(0, 12),
+    condition: isBetween({ start: 0, end: 12 }),
     next: [
       {
         type: ConditionType.Condition,
         key: 'geolocation',
-        condition: isEqual('Mumbai'),
+        condition: isEqual({ target: 'Mumbai' }),
         result: () => ({
           amount: 0.032,
           emi: 8.075,
@@ -80,7 +82,6 @@ const testData = {
 let output: Config = runRules<Config>(testData, rules);
 console.log(output);
 
-
 const newRules: Array<RuleJSON<Config>> = [
   {
     type: ConditionType.And,
@@ -90,23 +91,23 @@ const newRules: Array<RuleJSON<Config>> = [
         key: 'tenure',
         condition: {
           name: ConditionName.isBetween,
-          start:20,
-          end: 30
-        }
+          start: 20,
+          end: 30,
+        },
       },
       {
         type: ConditionType.Condition,
-        key: 'city',
+        key: 'geolocation',
         condition: {
-          name: 'isEqual',
-          values: ['Delhi']
-        }
-      }
+          name: ConditionName.isEqual,
+          target: 'Mumbai',
+        },
+      },
     ],
     result: {
       amount: 10,
-      emi: 5
-    }
+      emi: 5,
+    },
   },
   {
     type: ConditionType.And,
@@ -114,19 +115,26 @@ const newRules: Array<RuleJSON<Config>> = [
       {
         type: ConditionType.Condition,
         key: 'tenure',
-        condition: isBetween(50, 100)
+        condition: {
+          name: ConditionName.isBetween,
+          start: 50,
+          end: 100,
+        },
       },
       {
         type: ConditionType.Condition,
-        key: 'city',
-        condition: isEqual('Delhi')
-      }
+        key: 'geolocation',
+        condition: {
+          name: ConditionName.isEqual,
+          target: 'Bangalore',
+        },
+      },
     ],
     result: {
       amount: 20,
-      emi: 8
-    }
-  }
+      emi: 8,
+    },
+  },
 ];
 
-console.log(JSON.stringify(newRules));
+console.log(JSON.stringify(newRules), newRules);

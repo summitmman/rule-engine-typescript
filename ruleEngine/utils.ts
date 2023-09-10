@@ -6,8 +6,17 @@ import {
   INot,
   IDefault,
   ResultFunction,
+  ConditionFunction,
+  ConditionNameType,
 } from './interfaces';
 import { ConditionType } from './enums';
+import * as conditionHelpers from './conditionHelpers';
+
+const initCondition = (condition: ConditionNameType): ConditionFunction => {
+  const { name } = condition;
+  delete condition.name;
+  return conditionHelpers[name](condition);
+};
 
 const runCondition = <T>(
   dataSource: any,
@@ -16,6 +25,9 @@ const runCondition = <T>(
   let final: boolean | null = null;
   switch (rule.type) {
     case ConditionType.Condition: {
+      if (typeof rule.condition === 'object') {
+        rule.condition = initCondition(rule.condition);
+      }
       final = rule.condition(_.get(dataSource, rule.key), dataSource);
       break;
     }

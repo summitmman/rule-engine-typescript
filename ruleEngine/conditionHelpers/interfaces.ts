@@ -15,4 +15,4 @@ interface IisEqual extends IConditionHelper {
   name: ConditionHelperName.isEqual;
   target: any;
 }
-export type ConditionNameType = IisBetween | IisEqual;
+export type ConditionHelper = IisBetween | IisEqual;

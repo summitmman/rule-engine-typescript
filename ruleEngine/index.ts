@@ -1,0 +1,3 @@
+class RuleEngine<T> {
+  constructor() {}
+}

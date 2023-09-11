@@ -1,11 +1,13 @@
-import { ConditionName, ConditionType } from './enums';
-
-
+import { ConditionType } from './enums';
+import {
+  ConditionHelper,
+  ConditionFunction,
+} from './conditionHelpers/interfaces';
 
 export interface ICondition {
   type: ConditionType.Condition;
   key: string;
-  condition: ConditionFunction | ConditionNameType;
+  condition: ConditionFunction | ConditionHelper;
 }
 export interface IConditionGroup {
   type: Exclude<ConditionType, ConditionType.Condition | ConditionType.Not>;
@@ -39,5 +41,3 @@ export interface IDefault<T> extends IResult<T> {
 export type Rule<T> =
   | (IRule & (Condition<T> | ConditionGroup<T> | Not<T>))
   | IDefault<T>;
-
-

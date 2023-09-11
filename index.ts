@@ -1,10 +1,11 @@
 // Import stylesheets
 import './style.css';
 // Import modules
-import { Rule, RuleJSON } from './ruleEngine/interfaces';
-import { ConditionName, ConditionType } from './ruleEngine/enums';
+import { Rule } from './ruleEngine/interfaces';
+import { ConditionType } from './ruleEngine/enums';
 import { runRules } from './ruleEngine/utils';
-import * as conditionHelper from './ruleEngine/conditionHelpers';
+import { helpers } from './ruleEngine/conditionHelpers';
+import { ConditionHelperName } from './ruleEngine/conditionHelpers/enums';
 
 // Write TypeScript code!
 const appDiv: HTMLElement = document.getElementById('app');
@@ -15,7 +16,7 @@ interface Config {
   emi: number;
 }
 
-const { isBetween, isEqual } = conditionHelper;
+const { isBetween, isEqual } = helpers;
 
 // TODO:
 // 1. add else support
@@ -76,13 +77,13 @@ const rules: Array<Rule<Config>> = [
 const testData = {
   tenure: 6,
   pinlocation: '10.0',
-  geolocation: 'Bangalore',
+  geolocation: 'Mumbai',
 };
 
 let output: Config = runRules<Config>(testData, rules);
 console.log(output);
 
-const newRules: Array<RuleJSON<Config>> = [
+const newRules: Array<Rule<Config>> = [
   {
     type: ConditionType.And,
     conditions: [
@@ -90,16 +91,16 @@ const newRules: Array<RuleJSON<Config>> = [
         type: ConditionType.Condition,
         key: 'tenure',
         condition: {
-          name: ConditionName.isBetween,
-          start: 20,
-          end: 30,
+          name: ConditionHelperName.isBetween,
+          start: 0,
+          end: 12,
         },
       },
       {
         type: ConditionType.Condition,
         key: 'geolocation',
         condition: {
-          name: ConditionName.isEqual,
+          name: ConditionHelperName.isEqual,
           target: 'Mumbai',
         },
       },
@@ -116,16 +117,16 @@ const newRules: Array<RuleJSON<Config>> = [
         type: ConditionType.Condition,
         key: 'tenure',
         condition: {
-          name: ConditionName.isBetween,
-          start: 50,
-          end: 100,
+          name: ConditionHelperName.isBetween,
+          start: 13,
+          end: 24,
         },
       },
       {
         type: ConditionType.Condition,
         key: 'geolocation',
         condition: {
-          name: ConditionName.isEqual,
+          name: ConditionHelperName.isEqual,
           target: 'Bangalore',
         },
       },
@@ -137,4 +138,5 @@ const newRules: Array<RuleJSON<Config>> = [
   },
 ];
 
-console.log(JSON.stringify(newRules), newRules);
+let newOutput: Config = runRules<Config>(testData, newRules);
+console.log(newOutput);

@@ -16,3 +16,9 @@ interface IisEqual extends IConditionHelper {
   target: any;
 }
 export type ConditionHelper = IisBetween | IisEqual;
+export type Helpers<H = ConditionHelperName> = {
+  [key in ConditionHelperName & H]: {
+    fn: ConditionFunctionGenerator;
+    args: string[];
+  };
+}

@@ -1,5 +1,9 @@
 import { ConditionHelperName } from './enums';
-import { ConditionFunction, ConditionFunctionGenerator } from './interfaces';
+import {
+  ConditionFunction,
+  ConditionFunctionGenerator,
+  Helpers,
+} from './interfaces';
 
 const isBetween: ConditionFunctionGenerator = <T extends string | number>(
   start: T,
@@ -18,9 +22,13 @@ const isEqual: ConditionFunctionGenerator = (
   };
 };
 
-export const helpers: {
-  [key in ConditionHelperName]: ConditionFunctionGenerator;
-} = {
-  [ConditionHelperName.isBetween]: isBetween,
-  [ConditionHelperName.isEqual]: isEqual,
+export const helpers: Helpers = {
+  [ConditionHelperName.isBetween]: {
+    fn: isBetween,
+    args: ['start', 'end'],
+  },
+  [ConditionHelperName.isEqual]: {
+    fn: isEqual,
+    args: ['target'],
+  },
 };

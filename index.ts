@@ -6,6 +6,8 @@ import { ConditionType } from './ruleEngine/enums';
 import { runRules } from './ruleEngine/utils';
 import { helpers } from './ruleEngine/conditionHelpers';
 import { ConditionHelperName } from './ruleEngine/conditionHelpers/enums';
+import { RuleEngine } from './ruleEngine';
+import { ConditionFunction, ConditionFunctionGenerator, Helpers } from './ruleEngine/conditionHelpers/interfaces';
 
 // Write TypeScript code!
 const appDiv: HTMLElement = document.getElementById('app');
@@ -25,12 +27,12 @@ const rules: Array<Rule<Config>> = [
   {
     type: ConditionType.Condition,
     key: 'tenure',
-    condition: isBetween({ start: 0, end: 12 }),
+    condition: isBetween.fn({ start: 0, end: 12 }),
     next: [
       {
         type: ConditionType.Condition,
         key: 'geolocation',
-        condition: isEqual({ target: 'Mumbai' }),
+        condition: isEqual.fn({ target: 'Mumbai' }),
         result: () => ({
           amount: 0.032,
           emi: 8.075,
@@ -39,7 +41,7 @@ const rules: Array<Rule<Config>> = [
       {
         type: ConditionType.Condition,
         key: 'geolocation',
-        condition: isEqual('Bangalore'),
+        condition: isEqual.fn('Bangalore'),
         result: {
           amount: 0.034,
           emi: 8.077,
@@ -50,7 +52,7 @@ const rules: Array<Rule<Config>> = [
   {
     type: ConditionType.Condition,
     key: 'tenure',
-    condition: isBetween(13, 24),
+    condition: isBetween.fn(13, 24),
     result: () => ({
       amount: 0.06,
       emi: 15.019,
@@ -59,7 +61,7 @@ const rules: Array<Rule<Config>> = [
   {
     type: ConditionType.Condition,
     key: 'tenure',
-    condition: isBetween(25, 36),
+    condition: isBetween.fn(25, 36),
     result: () => ({
       amount: 0.087,
       emi: 21.963,
@@ -81,7 +83,7 @@ const testData = {
 };
 
 let output: Config = runRules<Config>(testData, rules);
-console.log(output);
+console.log('output', output);
 
 const newRules: Array<Rule<Config>> = [
   {
@@ -139,4 +141,24 @@ const newRules: Array<Rule<Config>> = [
 ];
 
 let newOutput: Config = runRules<Config>(testData, newRules);
-console.log(newOutput);
+console.log('newOutput', newOutput);
+
+const isMoreThan: ConditionFunctionGenerator = (min: number): ConditionFunction => {
+  return (value: any): boolean => {
+    return value > min;
+  };
+};
+enum LocalHelperNames {
+  isMoreThan = 'isMoreThan'
+}
+const localHelpers: Helpers<LocalHelperNames> = {
+  ...helpers,
+  [LocalHelperNames.isMoreThan]: {
+    fn: isMoreThan,
+    args: ['min']
+  },
+};
+
+const ruleEngine = new RuleEngine(newRules, localHelpers);
+const latestOutput = ruleEngine.runRules(testData);
+console.log('latestOutput', latestOutput);

@@ -10,21 +10,22 @@ import {
 import { ConditionType } from './enums';
 import { getHelperFunction } from './conditionHelpers/utils';
 import { ConditionHelperName } from '../ruleEngine/conditionHelpers/enums';
-import { ConditionFunctionGenerator } from '../ruleEngine/conditionHelpers/interfaces';
+import {
+  ConditionFunctionGenerator,
+  Helpers,
+} from '../ruleEngine/conditionHelpers/interfaces';
 import { helpers as libHelpers } from './conditionHelpers';
 
-const runCondition = <T, H>(
+const runCondition = <T, H = ConditionHelperName>(
   dataSource: any,
   rule: Rule<T> | ICondition | IConditionGroup | INot,
-  helpers: {
-    [key in ConditionHelperName & H]: ConditionFunctionGenerator;
-  } = libHelpers
+  helpers: Helpers<H> = libHelpers
 ): boolean | null => {
   let final: boolean | null = null;
   switch (rule.type) {
     case ConditionType.Condition: {
       if (typeof rule.condition === 'object') {
-        rule.condition = getHelperFunction(rule.condition);
+        rule.condition = getHelperFunction<H>(rule.condition, helpers);
       }
       final = rule.condition(_.get(dataSource, rule.key), dataSource);
       break;
@@ -74,12 +75,10 @@ const runResult = <T>(
   return result;
 };
 
-export const runRules = <T, H>(
+export const runRules = <T, H = ConditionHelperName>(
   dataSource: any,
   rules: Array<Rule<T>>,
-  helpers: {
-    [key in ConditionHelperName & H]: ConditionFunctionGenerator;
-  } = libHelpers
+  helpers: Helpers<H> = libHelpers
 ): T | null => {
   // if data source is invalid return null
   if (!dataSource || typeof dataSource !== 'object') {
@@ -99,7 +98,7 @@ export const runRules = <T, H>(
       defaultRule = rule as IDefault<T>;
     } else {
       // for all other rules, run their conditions
-      const result = runCondition<T>(dataSource, rule, helpers);
+      const result = runCondition<T, H>(dataSource, rule, helpers);
       if (result) {
         // if matching config has nesting, run nesting
         if (rule.next) {

@@ -1,20 +1,12 @@
-import { ConditionFunction, ConditionFunctionGenerator, ConditionHelper } from './interfaces';
-import { ConditionHelperName } from './enums';
+import { ConditionFunction, ConditionHelper, Helpers } from './interfaces';
 import { helpers as libHelpers } from './index';
+import { ConditionHelperName } from '../../ruleEngine/conditionHelpers/enums';
 
-export const getHelperFunction = <H>(
+export const getHelperFunction = <H = ConditionHelperName>(
   conditionName: ConditionHelper,
-  helpers: {
-    [key in ConditionHelperName & H]: ConditionFunctionGenerator;
-  } = libHelpers
+  helpers: Helpers<H> = libHelpers
 ): ConditionFunction => {
-  switch (conditionName.name) {
-    case ConditionHelperName.isBetween: {
-      return helpers['isBetween'](conditionName.start, conditionName.end);
-    }
-    case ConditionHelperName.isEqual:
-    default: {
-      return helpers['isEqual'](conditionName.target);
-    }
-  }
+  const helper = helpers[conditionName.name] || helpers['isEqual'];
+  const args = helper.args.map((key) => conditionName[key]);
+  return helper.fn.call(null, ...args);
 };

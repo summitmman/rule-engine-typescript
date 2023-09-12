@@ -7,7 +7,11 @@ import { runRules } from './ruleEngine/utils';
 import { helpers } from './ruleEngine/conditionHelpers';
 import { ConditionHelperName } from './ruleEngine/conditionHelpers/enums';
 import { RuleEngine } from './ruleEngine';
-import { ConditionFunction, ConditionFunctionGenerator, Helpers } from './ruleEngine/conditionHelpers/interfaces';
+import {
+  ConditionFunction,
+  ConditionFunctionGenerator,
+  Helpers,
+} from './ruleEngine/conditionHelpers/interfaces';
 
 // Write TypeScript code!
 const appDiv: HTMLElement = document.getElementById('app');
@@ -143,22 +147,96 @@ const newRules: Array<Rule<Config>> = [
 let newOutput: Config = runRules<Config>(testData, newRules);
 console.log('newOutput', newOutput);
 
-const isMoreThan: ConditionFunctionGenerator = (min: number): ConditionFunction => {
+const isMoreThan: ConditionFunctionGenerator = (
+  min: number
+): ConditionFunction => {
   return (value: any): boolean => {
     return value > min;
   };
 };
 enum LocalHelperNames {
-  isMoreThan = 'isMoreThan'
+  isMoreThan = 'isMoreThan',
 }
-const localHelpers: Helpers<LocalHelperNames> = {
+const sample = {
+  ...LocalHelperNames,
+  ...ConditionHelperName,
+};
+
+type NewHelperNames = keyof typeof sample;
+const localHelpers: Helpers<NewHelperNames> = {
   ...helpers,
   [LocalHelperNames.isMoreThan]: {
     fn: isMoreThan,
-    args: ['min']
+    args: ['min'],
   },
 };
 
-const ruleEngine = new RuleEngine(newRules, localHelpers);
+const latestRules: Array<Rule<Config>> = [
+  {
+    type: ConditionType.And,
+    conditions: [
+      {
+        type: ConditionType.Condition,
+        key: 'tenure',
+        condition: {
+          name: ConditionHelperName.isBetween,
+          start: 0,
+          end: 12,
+        },
+      },
+      {
+        type: ConditionType.Condition,
+        key: 'geolocation',
+        condition: {
+          name: ConditionHelperName.isEqual,
+          target: 'Mumbai',
+        },
+      },
+      {
+        type: ConditionType.Condition,
+        key: 'tenure',
+        condition: {
+          name: LocalHelperNames.isMoreThan,
+          min: 6,
+        },
+      },
+    ],
+    result: {
+      amount: 10,
+      emi: 5,
+    },
+  },
+  {
+    type: ConditionType.And,
+    conditions: [
+      {
+        type: ConditionType.Condition,
+        key: 'tenure',
+        condition: {
+          name: ConditionHelperName.isBetween,
+          start: 13,
+          end: 24,
+        },
+      },
+      {
+        type: ConditionType.Condition,
+        key: 'geolocation',
+        condition: {
+          name: ConditionHelperName.isEqual,
+          target: 'Bangalore',
+        },
+      },
+    ],
+    result: {
+      amount: 20,
+      emi: 8,
+    },
+  },
+];
+
+const ruleEngine = new RuleEngine<Config, NewHelperNames>(
+  latestRules,
+  localHelpers
+);
 const latestOutput = ruleEngine.runRules(testData);
 console.log('latestOutput', latestOutput);

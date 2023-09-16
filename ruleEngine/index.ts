@@ -18,7 +18,7 @@ export class RuleEngine<C> {
     }
   }
 
-  public readonly run = (data: object): C => {
+  public readonly runOn = (data: object): C => {
     return runRules<C>(data, this._rules, this._conditionHelpers);
   };
 }

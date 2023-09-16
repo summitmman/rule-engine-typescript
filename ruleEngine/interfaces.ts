@@ -1,12 +1,10 @@
+import { IConditionHelperType } from './conditionHelpers/interfaces';
 import { ConditionType } from './enums';
-
-export type ConditionFunction = (value: any, dataSource: any) => boolean;
-export type ConditionFunctionGenerator = (...args) => ConditionFunction;
 
 export interface ICondition {
   type: ConditionType.Condition;
   key: string;
-  condition: ConditionFunction;
+  condition: IConditionHelperType;
 }
 export interface IConditionGroup {
   type: Exclude<ConditionType, ConditionType.Condition | ConditionType.Not>;

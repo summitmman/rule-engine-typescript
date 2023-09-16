@@ -3,8 +3,12 @@ import './style.css';
 // Import modules
 import { Rule } from './ruleEngine/interfaces';
 import { ConditionType } from './ruleEngine/enums';
-import { runRules } from './ruleEngine/utils';
-import { isBetween, isEqual } from './ruleEngine/conditionHelpers';
+import {
+  myConditionHelperName,
+  myConditionHelpers,
+} from './myConditionHelpers';
+import { ConditionHelperName } from './ruleEngine/conditionHelpers/enums';
+import { RuleEngine } from './ruleEngine';
 
 // Write TypeScript code!
 const appDiv: HTMLElement = document.getElementById('app');
@@ -22,32 +26,45 @@ const rules: Array<Rule<Config>> = [
   {
     type: ConditionType.Condition,
     key: 'tenure',
-    condition: isBetween(0, 12),
+    condition: {
+      name: myConditionHelperName.isLessThan,
+      value: 13,
+    },
     next: [
       {
         type: ConditionType.Condition,
         key: 'geolocation',
-        condition: isEqual('Mumbai'),
-        result: () => ({
+        condition: {
+          name: ConditionHelperName.isEqual,
+          value: 'Mumbai',
+        },
+        result: {
           amount: 0.032,
           emi: 8.075,
-        }),
+        },
       },
       {
         type: ConditionType.Condition,
         key: 'geolocation',
-        condition: isEqual('Bangalore'),
-        result: {
+        condition: {
+          name: ConditionHelperName.isEqual,
+          value: 'Bangalore',
+        },
+        result: () => ({
           amount: 0.034,
           emi: 8.077,
-        },
+        }),
       },
     ],
   },
   {
     type: ConditionType.Condition,
     key: 'tenure',
-    condition: isBetween(13, 24),
+    condition: {
+      name: ConditionHelperName.isBetween,
+      start: 13,
+      end: 24,
+    },
     result: () => ({
       amount: 0.06,
       emi: 15.019,
@@ -56,7 +73,11 @@ const rules: Array<Rule<Config>> = [
   {
     type: ConditionType.Condition,
     key: 'tenure',
-    condition: isBetween(25, 36),
+    condition: {
+      name: ConditionHelperName.isBetween,
+      start: 25,
+      end: 36,
+    },
     result: () => ({
       amount: 0.087,
       emi: 21.963,
@@ -77,5 +98,6 @@ const testData = {
   geolocation: 'Bangalore',
 };
 
-let output: Config = runRules<Config>(testData, rules);
+const ruleEngine = new RuleEngine(rules, myConditionHelpers);
+let output: Config = ruleEngine.run(testData);
 console.log(output);

@@ -8,15 +8,38 @@ import {
   ResultFunction,
 } from './interfaces';
 import { ConditionType } from './enums';
+import { conditionHelpers as defaultConditionHelpers } from './conditionHelpers';
+import { ConditionHelperName } from './conditionHelpers/enums';
 
 const runCondition = <T>(
   dataSource: any,
-  rule: Rule<T> | ICondition | IConditionGroup | INot
+  rule: Rule<T> | ICondition | IConditionGroup | INot,
+  conditionHelpers = defaultConditionHelpers
 ): boolean | null => {
   let final: boolean | null = null;
   switch (rule.type) {
     case ConditionType.Condition: {
-      final = rule.condition(_.get(dataSource, rule.key), dataSource);
+      // Get helper
+      const helper = conditionHelpers[rule.condition.name];
+      const defaultHelper =
+        defaultConditionHelpers[ConditionHelperName.isEqual];
+      // Prepare helper params
+      const params = JSON.parse(JSON.stringify(rule.condition));
+      delete params.name;
+      // Get value to compare
+      const value = _.get(dataSource, rule.key);
+      if (helper) {
+        final = helper(value, params);
+      } else {
+        const paramKeys = Object.keys(params);
+        if (paramKeys.includes('value')) {
+          final = defaultHelper(value, params);
+        } else if (paramKeys.length) {
+          final = defaultHelper(value, params[paramKeys[0]]);
+        } else {
+          final = false;
+        }
+      }
       break;
     }
     case ConditionType.And: {
@@ -66,7 +89,8 @@ const runResult = <T>(
 
 export const runRules = <T>(
   dataSource: any,
-  rules: Array<Rule<T>>
+  rules: Array<Rule<T>>,
+  conditionHelpers = defaultConditionHelpers
 ): T | null => {
   // if data source is invalid return null
   if (!dataSource || typeof dataSource !== 'object') {
@@ -86,12 +110,13 @@ export const runRules = <T>(
       defaultRule = rule as IDefault<T>;
     } else {
       // for all other rules, run their conditions
-      const result = runCondition<T>(dataSource, rule);
+      const result = runCondition<T>(dataSource, rule, conditionHelpers);
       if (result) {
         // if matching config has nesting, run nesting
         if (rule.next) {
-          return runRules(dataSource, rule.next);
+          return runRules(dataSource, rule.next, conditionHelpers);
         }
+        console.log('SUMIT LOG', rule);
         // else we have found matching rule and can return the result
         return runResult(rule.result, dataSource, rule.id);
       }

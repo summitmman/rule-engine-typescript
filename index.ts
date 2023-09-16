@@ -50,10 +50,10 @@ const rules: Array<Rule<Config>> = [
           name: ConditionHelperName.isEqual,
           value: 'Bangalore',
         },
-        result: () => ({
+        result: {
           amount: 0.034,
           emi: 8.077,
-        }),
+        },
       },
     ],
   },
@@ -65,10 +65,10 @@ const rules: Array<Rule<Config>> = [
       start: 13,
       end: 24,
     },
-    result: () => ({
+    result: {
       amount: 0.06,
       emi: 15.019,
-    }),
+    },
   },
   {
     type: ConditionType.Condition,
@@ -78,17 +78,17 @@ const rules: Array<Rule<Config>> = [
       start: 25,
       end: 36,
     },
-    result: () => ({
+    result: {
       amount: 0.087,
       emi: 21.963,
-    }),
+    },
   },
   {
     type: ConditionType.Default,
-    result: () => ({
+    result: {
       amount: 1.1,
       emi: 1.1,
-    }),
+    },
   },
 ];
 

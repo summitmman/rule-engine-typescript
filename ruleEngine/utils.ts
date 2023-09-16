@@ -5,7 +5,6 @@ import {
   IConditionGroup,
   INot,
   IDefault,
-  ResultFunction,
 } from './interfaces';
 import { ConditionType } from './enums';
 import { conditionHelpers as defaultConditionHelpers } from './conditionHelpers';
@@ -116,9 +115,8 @@ export const runRules = <T>(
         if (rule.next) {
           return runRules(dataSource, rule.next, conditionHelpers);
         }
-        console.log('SUMIT LOG', rule);
         // else we have found matching rule and can return the result
-        return runResult(rule.result, dataSource, rule.id);
+        return rule.result;
       }
     }
   }
@@ -127,7 +125,7 @@ export const runRules = <T>(
   // check if there was a default type rule
   // if so return the default result
   if (defaultRule) {
-    return runResult(defaultRule.result, dataSource, ConditionType.Default);
+    return defaultRule.result;
   }
 
   return null;

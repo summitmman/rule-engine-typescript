@@ -15,9 +15,8 @@ export interface INot {
   condition: IConditionGroup | ICondition | INot;
 }
 
-export type ResultFunction<T> = (dataSource: any, id?: string) => T;
 interface IResult<T> {
-  result: T | ResultFunction<T>;
+  result: T;
 }
 interface INext<T> {
   next: Array<Rule<T>>;

@@ -84,17 +84,22 @@ export const runRules = <T>(
     // if rule is of type default, keep it for later
     if (rule.type === ConditionType.Default) {
       defaultRule = rule as IDefault<T>;
-    } else {
-      // for all other rules, run their conditions
-      const result = runCondition<T>(dataSource, rule);
-      if (result) {
-        // if matching config has nesting, run nesting
-        if (rule.next) {
-          return runRules(dataSource, rule.next);
+      continue;
+    }
+    // for all other rules, run their conditions
+    const result = runCondition<T>(dataSource, rule);
+    if (result) {
+      // if matching config has nesting, run nesting
+      if (rule.next) {
+        const nestedResult = runRules(dataSource, rule.next);
+        if (nestedResult == null) {
+          continue;
+        } else {
+          return nestedResult;
         }
-        // else we have found matching rule and can return the result
-        return runResult(rule.result, dataSource, rule.id);
       }
+      // else we have found matching rule and can return the result
+      return runResult(rule.result, dataSource, rule.id);
     }
   }
 

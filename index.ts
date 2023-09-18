@@ -46,8 +46,8 @@ const rules: Array<Rule<Config>> = [
   },
   {
     type: ConditionType.Condition,
-    key: 'tenure',
-    condition: isBetween(13, 24),
+    key: 'geolocation',
+    condition: isEqual('Chennai'),
     result: () => ({
       amount: 0.06,
       emi: 15.019,
